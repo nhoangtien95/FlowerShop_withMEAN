@@ -13,7 +13,7 @@ passport.serializeUser(function(user, done){
 });
 
 passport.deserializeUser(function(id, done){
-  User.findById(id, function(err, user){
+  User.findUserById(id ,function(err, user){
     done(err, user);
   });
 });
@@ -24,7 +24,7 @@ passport.use('local-login', new localStrategy({
   passwordField: 'password',
   passReqToCallback: true
 }, function(req, email, password, done){
-  User.findOne( {email: email}, function(err, user){
+  User.findUserByEmail(email, function(err, user){
     if (err) return done(err);
 
     if(!user){
@@ -53,21 +53,23 @@ exports.isAuthenticated = function(req, res, next){
 
 
 exports.SignUp = function( req, res, next){
-  var user = new User();
 
-  user.profile.name = req.body.name;
-  user.email = req.body.email;
-  user.password = req.body.password;
-  user.profile.address = req.body.address;
-  user.avatar = user.avatar();
+  var newUser = [{
+    "name": req.body.name,
+    "email": req.body.email,
+    "password": req.body.password,
+    "address": req.body.address,
+    "avatar": User.avatar(),
+    "abc": req.body.address
+  }];
 
-  User.findOne({ email: req.body.email}, function (err, existingUser){
+  User.findUserByEmail( req.body.email, function (err, existingUser){
     if (existingUser){
       req.flash('existingUser', "Email đã tồn tại");
       return res.redirect('/signup');
     }
     else {
-      user.save(function (err, user){
+      User.saveUser(newUser, function (err, user){
         if (err) return next(err)
         req.flash('createdUser', "Tạo tài khoản thành công");
         return res.redirect('/signup');
