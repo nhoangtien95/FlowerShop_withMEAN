@@ -52,7 +52,7 @@ exports.isAuthenticated = function(req, res, next){
 exports.getSignUp = function(req, res)
 {
   if(req.user) return res.redirect('/');
-  res.render('sites/signup', {
+  res.render('sites.client/signup', {
    errors: req.flash('existingUser')
   });
 }

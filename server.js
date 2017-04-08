@@ -11,6 +11,7 @@ var secret = require('./config/secret');
 var db = require('./config/db');
 var session = require('express-session');
 var mongoStore = require('connect-mongo/es5')(session);
+ var path = require('path');
 
 
 var app = express();
@@ -36,7 +37,9 @@ app.use(session({
   store: new mongoStore({ url: secret.db, autoReconnect: true })
 }));
 
+// view engine setup
 app.engine('ejs', engine);
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'ejs');
 
 var userRoutes = require('./app/routes/user.server.routes');
