@@ -24,6 +24,7 @@ var UserSchema = new mongoose.Schema({
 });
 
 var User = mongoose.model('User', UserSchema);
+exports.su = mongoose.model('User', UserSchema);
 
 var findUserByEmail = function(email, callback){
   User.findOne({ email: email}, callback);
@@ -39,9 +40,15 @@ var saveUser = function(user, callback){
 
 
 /*Compare password in db with user's input*/
- var comparePassword = function(password){
-  if (this.password == password) return true;
-  else return false;
+ var comparePassword = function(email, password){
+   User.findOne({ email: email },function (err, user){
+     if (err) return false;
+     else{
+       if (user.password == password) return true;
+       else return false;
+     }
+
+   });
 };
 
 //Random user's avatar

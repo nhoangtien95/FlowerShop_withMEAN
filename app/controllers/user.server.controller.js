@@ -31,7 +31,7 @@ passport.use('local-login', new localStrategy({
       return done(null, false, req.flash('loginMessage', 'Tài khoản không tồn tại '));
     }
 
-    if(user.comparePassword(password) == false){
+    if(user.comparePassword(email, password) == false){
       return done(null, false, req.flash('loginMessage', 'Mật khẩu không chính xác '));
     }
 
@@ -46,22 +46,25 @@ exports.isAuthenticated = function(req, res, next){
   if (req.isAuthenticated()){
     return next();
   }
-
   res.redirect('/');
-
 }
 
+exports.getSignUp = function(req, res)
+{
+  if(req.user) return res.redirect('/');
+  res.render('sites/signup', {
+   errors: req.flash('existingUser')
+  });
+}
 
 exports.SignUp = function( req, res, next){
 
-  var newUser = [{
-    "name": req.body.name,
-    "email": req.body.email,
-    "password": req.body.password,
-    "address": req.body.address,
-    "avatar": User.avatar(),
-    "abc": req.body.address
-  }];
+  var newUser = new User.User();
+    newUser.email = req.body.email;
+    newUser.profile.name = req.body.name;
+    newUser.profile.address = req.body.address;
+    newUser.profile.avatar = User.avatar();
+    newUser.password = req.body.password;
 
   User.findUserByEmail( req.body.email, function (err, existingUser){
     if (existingUser){
